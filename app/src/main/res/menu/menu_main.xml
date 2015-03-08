@@ -4,9 +4,10 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/recordItem"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="always" />
+        android:icon="@android:drawable/ic_menu_camera"
+        app:showAsAction="always"
+        android:title="Record" />
 
 </menu>

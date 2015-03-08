@@ -2,19 +2,24 @@ package pro.vylgin.cameraarcsinus.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,16 +38,11 @@ public class RecordFragment extends Fragment {
             "CameraArcsinus" +
             File.separator;
 
-    public static final int CAMERA_ID = Camera.CameraInfo.CAMERA_FACING_BACK;
-//    private static final int CAMERA_ID = Camera.CameraInfo.CAMERA_FACING_FRONT;
-
     private Camera camera;
     private CameraPreview cameraPreview;
-
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
-
-    static int countRecord = 0;
+    private int cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 
     public static RecordFragment newInstance() {
         File videoPath = new File(VIDEO_PATH);
@@ -61,12 +61,24 @@ public class RecordFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_record, container, false);
 
-        camera = getCameraInstance();
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            ((ActionBarActivity)getActivity()).getSupportActionBar().hide();
+        } else {
+//            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-        cameraPreview = new CameraPreview(getActivity(), camera);
+        camera = getCameraInstance();
+        cameraPreview = new CameraPreview(getActivity(), cameraId, camera);
         FrameLayout preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);
         preview.addView(cameraPreview);
 
@@ -76,29 +88,18 @@ public class RecordFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         if (isRecording) {
-                            // stop recording and release camera
-                            mediaRecorder.stop();  // stop the recording
-                            releaseMediaRecorder(); // release the MediaRecorder object
-                            camera.lock();         // take camera access back from MediaRecorder
-
-                            // inform the user that recording has stopped
-                            captureButton.setText("Capture");
-
+                            mediaRecorder.stop();
+                            releaseMediaRecorder();
+                            camera.lock();
+                            captureButton.setText("Record");
                             isRecording = false;
                         } else {
-                            // initialize video camera
                             if (prepareVideoRecorder()) {
-                                // Camera is available and unlocked, MediaRecorder is prepared,
-                                // now you can start recording
                                 mediaRecorder.start();
-
-                                // inform the user that recording has started
                                 captureButton.setText("Stop");
                                 isRecording = true;
                             } else {
-                                // prepare didn't work, release the camera
                                 releaseMediaRecorder();
-                                // inform user
                             }
                         }
                     }
@@ -108,7 +109,6 @@ public class RecordFragment extends Fragment {
 
         return rootView;
     }
-
 
     @Override
     public void onPause() {
@@ -122,21 +122,46 @@ public class RecordFragment extends Fragment {
         releaseCamera();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_record, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.changeCamera) {
+            Toast.makeText(getActivity(), "Change Camera", Toast.LENGTH_SHORT).show();
+            releaseMediaRecorder();
+            releaseCamera();
+
+            if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+            } else {
+                cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+            }
+
+            prepareCameraPreview();
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     private boolean prepareVideoRecorder() {
-//        camera = getCameraInstance();
         mediaRecorder = new MediaRecorder();
 
-        // Step 1: Unlock and set camera to MediaRecorder
         camera.unlock();
         mediaRecorder.setCamera(camera);
 
-        // Step 2: Set sources
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
-        // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         CamcorderProfile profile = null;
+
 //        if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_1080P)) {
 //            profile = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
 //        } else if (CamcorderProfile.hasProfile(CamcorderProfile.QUALITY_720P)) {
@@ -155,28 +180,18 @@ public class RecordFragment extends Fragment {
             mediaRecorder.setProfile(profile);
         }
 
-        // Step 4: Set output file
-        mediaRecorder.setOutputFile(VIDEO_PATH +
-                String.valueOf(countRecord) +
-                ".mp4");
-
         mediaRecorder.setOutputFile(getOutputMediaFile().toString());
-
-
-        // Step 5: Set the preview output
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
+        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId, camera));
 
-        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), CAMERA_ID, camera));
-
-        // Step 6: Prepare configured MediaRecorder
         try {
             mediaRecorder.prepare();
         } catch (IllegalStateException e) {
-            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            Log.d(TAG, e.getMessage());
             releaseMediaRecorder();
             return false;
         } catch (IOException e) {
-            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            Log.d(TAG, e.getMessage());
             releaseMediaRecorder();
             return false;
         }
@@ -184,31 +199,25 @@ public class RecordFragment extends Fragment {
         return true;
     }
 
-    public static Camera getCameraInstance() {
-        Camera camera = null;
+    public Camera getCameraInstance() {
+        Camera camera;
 
         if (Camera.getNumberOfCameras() >= 2) {
-            camera = Camera.open(CAMERA_ID);
+            camera = Camera.open(cameraId);
         } else {
             camera = Camera.open();
         }
 
-        return camera; // returns null if camera is unavailable
+        return camera;
     }
 
-    private static File getOutputMediaFile() {
-        File mediaStorageDir = new File(VIDEO_PATH);
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
+    private void prepareCameraPreview() {
+        camera = getCameraInstance();
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
-
-        return mediaFile;
+        ViewGroup rootLayout = (ViewGroup) cameraPreview.getParent();
+        cameraPreview.removeView(rootLayout);
+        cameraPreview = new CameraPreview(getActivity(), cameraId, camera);
+        cameraPreview.showView(rootLayout);
     }
 
     private void releaseMediaRecorder() {
@@ -225,6 +234,21 @@ public class RecordFragment extends Fragment {
             camera.release();
             camera = null;
         }
+    }
+
+    private static File getOutputMediaFile() {
+        File mediaStorageDir = new File(VIDEO_PATH);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d(TAG, "Failed to create directory");
+                return null;
+            }
+        }
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
+
+        return mediaFile;
     }
 
     public static int getCameraDisplayOrientation(Activity activity, int cameraId, Camera camera) {

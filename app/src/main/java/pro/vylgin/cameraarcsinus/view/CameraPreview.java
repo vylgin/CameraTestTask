@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
 
 import java.io.IOException;
 
@@ -18,11 +19,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Context context;
     private SurfaceHolder holder;
     private Camera camera;
+    private int cameraId;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, int cameraId, Camera camera) {
         super(context);
         this.context = context;
         this.camera = camera;
+        this.cameraId = cameraId;
 
         holder = getHolder();
         holder.addCallback(this);
@@ -50,7 +53,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception ignored){
         }
 
-        int rotation = RecordFragment.getCameraDisplayOrientation((Activity) context, RecordFragment.CAMERA_ID, camera);
+        int rotation = RecordFragment.getCameraDisplayOrientation((Activity) context, cameraId, camera);
         Camera.Parameters parameters = camera.getParameters();
         parameters.setRecordingHint(true);
         parameters.setRotation(rotation);
@@ -65,5 +68,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception e){
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
+    }
+
+    public void removeView(ViewGroup rootLayout) {
+        surfaceDestroyed(holder);
+        getHolder().removeCallback(this);
+        rootLayout.removeView(this);
+    }
+
+    public void showView(ViewGroup rootLayout) {
+        holder.addCallback(this);
+        rootLayout.addView(this, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 }

@@ -1,31 +1,15 @@
 package pro.vylgin.cameraarcsinus;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.hardware.Camera;
-import android.media.CamcorderProfile;
-import android.media.MediaRecorder;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
-import java.io.IOException;
 
 import pro.vylgin.cameraarcsinus.fragment.RecordFragment;
-import pro.vylgin.cameraarcsinus.view.CameraPreview;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements FragmentManager.OnBackStackChangedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -33,7 +17,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        showRecordFragment();
+        getFragmentManager().addOnBackStackChangedListener(this);
     }
 
 
@@ -45,12 +29,37 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Toast.makeText(this, "Action Settings", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.recordItem) {
+            showRecordFragment();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        shouldDisplayHomeUp();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        getFragmentManager().popBackStack();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void shouldDisplayHomeUp(){
+        boolean canback = getFragmentManager().getBackStackEntryCount() > 0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
     }
 
     private void showRecordFragment() {
@@ -58,8 +67,10 @@ public class MainActivity extends ActionBarActivity {
         if (recordFragment == null) {
             recordFragment = RecordFragment.newInstance();
         }
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.contentFrameLayout, recordFragment).commit();
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contentFrameLayout, recordFragment)
+                .addToBackStack(null)
+                .commit();
     }
-
 }
