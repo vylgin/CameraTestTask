@@ -5,17 +5,43 @@
     android:background="@color/background"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/changeCameraImageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/button_record_selector"
+            android:contentDescription="@string/change_camera" />
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/cameraPreview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/captureButton"
-        android:layout_width="100dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Record" />
+        android:layout_gravity="center" >
+
+        <Button
+            android:id="@+id/captureButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Record" />
+
+    </LinearLayout>
 
 </LinearLayout>

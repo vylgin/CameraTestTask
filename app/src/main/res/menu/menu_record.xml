@@ -5,7 +5,7 @@
     <item
         android:id="@+id/changeCamera"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_action_change_camera"
+        android:icon="@drawable/ic_change_camera_off"
         app:showAsAction="always"
         android:title="Change Camera" />
 

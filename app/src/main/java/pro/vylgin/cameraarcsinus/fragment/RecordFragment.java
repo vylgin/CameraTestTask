@@ -2,7 +2,6 @@ package pro.vylgin.cameraarcsinus.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -11,15 +10,12 @@ import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
+import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +39,7 @@ public class RecordFragment extends Fragment {
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
     private int cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    private boolean deviceHaveTwoCameras = Camera.getNumberOfCameras() >= 2;
 
     public static RecordFragment newInstance() {
         File videoPath = new File(VIDEO_PATH);
@@ -62,25 +59,29 @@ public class RecordFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_record, container, false);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-        {
-            ((ActionBarActivity)getActivity()).getSupportActionBar().hide();
-        } else {
-//            ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        ((ActionBarActivity)getActivity()).getSupportActionBar().hide();
 
         camera = getCameraInstance();
         cameraPreview = new CameraPreview(getActivity(), cameraId, camera);
         FrameLayout preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);
         preview.addView(cameraPreview);
+
+        final ImageButton changeCameraImageButton = (ImageButton) rootView.findViewById(R.id.changeCameraImageButton);
+        changeCameraImageButton.setVisibility(deviceHaveTwoCameras ? View.VISIBLE : View.INVISIBLE);
+        changeCameraImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeCamera();
+            }
+        });
 
         final Button captureButton = (Button) rootView.findViewById(R.id.captureButton);
         captureButton.setOnClickListener(
@@ -92,11 +93,13 @@ public class RecordFragment extends Fragment {
                             releaseMediaRecorder();
                             camera.lock();
                             captureButton.setText("Record");
+                            changeCameraImageButton.setVisibility(deviceHaveTwoCameras ? View.VISIBLE : View.INVISIBLE);
                             isRecording = false;
                         } else {
                             if (prepareVideoRecorder()) {
                                 mediaRecorder.start();
                                 captureButton.setText("Stop");
+                                changeCameraImageButton.setVisibility(View.INVISIBLE);
                                 isRecording = true;
                             } else {
                                 releaseMediaRecorder();
@@ -105,7 +108,6 @@ public class RecordFragment extends Fragment {
                     }
                 }
         );
-
 
         return rootView;
     }
@@ -119,20 +121,28 @@ public class RecordFragment extends Fragment {
         }
 
         releaseMediaRecorder();
+
+        if (getActivity().isFinishing()) {
+            releaseCamera();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        ((ActionBarActivity)getActivity()).getSupportActionBar().show();
+
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
         releaseCamera();
+
+        super.onDestroy();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.menu_record, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.changeCamera) {
-            Toast.makeText(getActivity(), "Change Camera", Toast.LENGTH_SHORT).show();
+    private void changeCamera() {
+        if (deviceHaveTwoCameras) {
             releaseMediaRecorder();
             releaseCamera();
 
@@ -143,11 +153,7 @@ public class RecordFragment extends Fragment {
             }
 
             prepareCameraPreview();
-
-            return true;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
 
@@ -202,10 +208,14 @@ public class RecordFragment extends Fragment {
     public Camera getCameraInstance() {
         Camera camera;
 
-        if (Camera.getNumberOfCameras() >= 2) {
-            camera = Camera.open(cameraId);
+        if (this.camera == null) {
+            if (deviceHaveTwoCameras) {
+                camera = Camera.open(cameraId);
+            } else {
+                camera = Camera.open();
+            }
         } else {
-            camera = Camera.open();
+            camera = this.camera;
         }
 
         return camera;
