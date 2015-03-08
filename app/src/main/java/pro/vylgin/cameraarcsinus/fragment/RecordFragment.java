@@ -83,8 +83,8 @@ public class RecordFragment extends Fragment {
             }
         });
 
-        final Button captureButton = (Button) rootView.findViewById(R.id.captureButton);
-        captureButton.setOnClickListener(
+        final Button recordButton = (Button) rootView.findViewById(R.id.recordButton);
+        recordButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -92,13 +92,13 @@ public class RecordFragment extends Fragment {
                             mediaRecorder.stop();
                             releaseMediaRecorder();
                             camera.lock();
-                            captureButton.setText("Record");
+                            recordButton.setText(getActivity().getString(R.string.record));
                             changeCameraImageButton.setVisibility(deviceHaveTwoCameras ? View.VISIBLE : View.INVISIBLE);
                             isRecording = false;
                         } else {
                             if (prepareVideoRecorder()) {
                                 mediaRecorder.start();
-                                captureButton.setText("Stop");
+                                recordButton.setText(getActivity().getString(R.string.stop_record));
                                 changeCameraImageButton.setVisibility(View.INVISIBLE);
                                 isRecording = true;
                             } else {
@@ -108,6 +108,14 @@ public class RecordFragment extends Fragment {
                     }
                 }
         );
+
+        Button cancelButton = (Button) rootView.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getFragmentManager().popBackStack();
+            }
+        });
 
         return rootView;
     }

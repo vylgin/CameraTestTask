@@ -1,4 +1,4 @@
-package pro.vylgin.cameraarcsinus;
+package pro.vylgin.cameraarcsinus.activity;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import pro.vylgin.cameraarcsinus.R;
 import pro.vylgin.cameraarcsinus.fragment.RecordFragment;
 
 

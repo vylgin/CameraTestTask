@@ -4,4 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="change_camera">Change Camera</string>
+    <string name="stop_record">STOP</string>
+    <string name="record">REC</string>
+    <string name="cancel">CANCEL</string>
 </resources>

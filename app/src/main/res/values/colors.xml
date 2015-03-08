@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="background" type="color">#ff303030</item>
+
+    <item name="record_on" type="color">#EE5949</item>
+    <item name="record_off" type="color">#EC4938</item>
+
+    <item name="cancel_off" type="color">#F59429</item>
+    <item name="cancel_on" type="color">@android:color/holo_orange_dark</item>
 </resources>
