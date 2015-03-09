@@ -10,4 +10,11 @@
         app:showAsAction="always"
         android:title="Record" />
 
+    <item
+        android:id="@+id/dictaphoneItem"
+        android:orderInCategory="100"
+        android:icon="@android:drawable/ic_btn_speak_now"
+        app:showAsAction="always"
+        android:title="Dictaphone" />
+
 </menu>

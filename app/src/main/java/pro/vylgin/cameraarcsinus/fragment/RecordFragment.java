@@ -8,7 +8,6 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,22 +18,15 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import pro.vylgin.cameraarcsinus.R;
+import pro.vylgin.cameraarcsinus.utils.Utils;
 import pro.vylgin.cameraarcsinus.view.CameraPreview;
 
 public class RecordFragment extends Fragment {
 
     public static final String TAG = RecordFragment.class.getSimpleName();
-
-    public static final String VIDEO_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() +
-            File.separator +
-            "CameraArcsinus" +
-            File.separator;
 
     private Camera camera;
     private CameraPreview cameraPreview;
@@ -47,11 +39,6 @@ public class RecordFragment extends Fragment {
     private ImageButton flashButton;
 
     public static RecordFragment newInstance() {
-        File videoPath = new File(VIDEO_PATH);
-        if (!videoPath.exists()) {
-            videoPath.mkdirs();
-        }
-
         RecordFragment recordFragment = new RecordFragment();
         Bundle args = new Bundle();
         recordFragment.setArguments(args);
@@ -235,7 +222,7 @@ public class RecordFragment extends Fragment {
             mediaRecorder.setProfile(profile);
         }
 
-        mediaRecorder.setOutputFile(getOutputMediaFile().toString());
+        mediaRecorder.setOutputFile(Utils.getOutputMediaFile(Utils.MediaType.VIDEO).toString());
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
         mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId, true));
 
@@ -293,21 +280,6 @@ public class RecordFragment extends Fragment {
             camera.release();
             camera = null;
         }
-    }
-
-    private static File getOutputMediaFile() {
-        File mediaStorageDir = new File(VIDEO_PATH);
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(TAG, "Failed to create directory");
-                return null;
-            }
-        }
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
-
-        return mediaFile;
     }
 
     public static int getCameraDisplayOrientation(Activity activity, int cameraId, boolean forMediaRecorder) {
