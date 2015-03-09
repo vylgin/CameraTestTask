@@ -1,6 +1,8 @@
 # CameraArcsinus
 Тестовое задание в фирму Arcsinus
 
+![Screenshot](https://raw.githubusercontent.com/vylgin/CameraArcsinus/master/Screenshot/Screenshot_2015-03-09-23-48-05.png)
+
 ### Задание
 
 Напишите тестовое Android-приложение, которое позволяет осуществлять следующие действия:
