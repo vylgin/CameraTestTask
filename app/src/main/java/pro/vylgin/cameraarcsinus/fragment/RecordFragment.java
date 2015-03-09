@@ -206,7 +206,7 @@ public class RecordFragment extends Fragment {
 
         mediaRecorder.setOutputFile(getOutputMediaFile().toString());
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
-        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId));
+        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId, true));
 
         try {
             mediaRecorder.prepare();
@@ -279,7 +279,7 @@ public class RecordFragment extends Fragment {
         return mediaFile;
     }
 
-    public static int getCameraDisplayOrientation(Activity activity, int cameraId) {
+    public static int getCameraDisplayOrientation(Activity activity, int cameraId, boolean forMediaRecorder) {
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -300,11 +300,16 @@ public class RecordFragment extends Fragment {
         }
 
         int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT && degrees == 90 && forMediaRecorder) {
             result = (info.orientation + degrees) % 360;
             result = (360 - result) % 360;
         } else {
-            result = (info.orientation - degrees + 360) % 360;
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT && !forMediaRecorder) {
+                result = (info.orientation + degrees) % 360;
+                result = (360 - result) % 360;
+            } else {
+                result = (info.orientation - degrees + 360) % 360;
+            }
         }
 
         return result;

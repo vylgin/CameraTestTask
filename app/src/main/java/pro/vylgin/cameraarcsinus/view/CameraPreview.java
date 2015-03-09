@@ -53,10 +53,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception ignored){
         }
 
-        int rotation = RecordFragment.getCameraDisplayOrientation((Activity) context, cameraId);
+        int rotation = RecordFragment.getCameraDisplayOrientation((Activity) context, cameraId, false);
         Camera.Parameters parameters = camera.getParameters();
         parameters.setRecordingHint(true);
-        parameters.setRotation(rotation);
 //        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
         camera.setParameters(parameters);
         camera.setDisplayOrientation(rotation);
