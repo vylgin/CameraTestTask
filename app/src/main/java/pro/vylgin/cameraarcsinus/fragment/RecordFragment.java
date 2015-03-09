@@ -2,6 +2,7 @@ package pro.vylgin.cameraarcsinus.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -117,6 +118,15 @@ public class RecordFragment extends Fragment {
             }
         });
 
+        ImageButton galleryButton = (ImageButton) rootView.findViewById(R.id.galleryButton);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, 1);
+            }
+        });
+
         return rootView;
     }
 
@@ -196,7 +206,7 @@ public class RecordFragment extends Fragment {
 
         mediaRecorder.setOutputFile(getOutputMediaFile().toString());
         mediaRecorder.setPreviewDisplay(cameraPreview.getHolder().getSurface());
-        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId, camera));
+        mediaRecorder.setOrientationHint(getCameraDisplayOrientation(getActivity(), cameraId));
 
         try {
             mediaRecorder.prepare();
@@ -269,7 +279,7 @@ public class RecordFragment extends Fragment {
         return mediaFile;
     }
 
-    public static int getCameraDisplayOrientation(Activity activity, int cameraId, Camera camera) {
+    public static int getCameraDisplayOrientation(Activity activity, int cameraId) {
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();

@@ -60,12 +60,13 @@
             android:textSize="@dimen/rec_buttons_text_size"
             android:text="@string/record" />
 
-        <Button
+        <ImageButton
             android:id="@+id/galleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginLeft="@dimen/rec_outside"
-            android:visibility="invisible"/>
+            android:background="@drawable/gallery_selector"
+            android:contentDescription="@string/change_camera" />
 
     </LinearLayout>
 

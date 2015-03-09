@@ -37,12 +37,13 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <Button
+        <ImageButton
             android:id="@+id/galleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginBottom="@dimen/rec_outside"
-            android:visibility="invisible"/>
+            android:background="@drawable/gallery_selector"
+            android:contentDescription="@string/change_camera" />
 
         <Button
             android:id="@+id/recordButton"
