@@ -20,12 +20,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder holder;
     private Camera camera;
     private int cameraId;
+    private boolean isFlashing;
 
-    public CameraPreview(Context context, int cameraId, Camera camera) {
+    public CameraPreview(Context context, int cameraId, Camera camera, boolean isFlashing) {
         super(context);
         this.context = context;
         this.camera = camera;
         this.cameraId = cameraId;
+        this.isFlashing = isFlashing;
 
         holder = getHolder();
         holder.addCallback(this);
@@ -48,6 +50,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
+        restartPreviewWithParameters(isFlashing);
+    }
+
+    public void restartPreviewWithParameters(boolean isFlashing) {
         try {
             camera.stopPreview();
         } catch (Exception ignored){
@@ -55,8 +61,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         int rotation = RecordFragment.getCameraDisplayOrientation((Activity) context, cameraId, false);
         Camera.Parameters parameters = camera.getParameters();
+
         parameters.setRecordingHint(true);
-//        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+        parameters.setFlashMode(isFlashing && (cameraId == Camera.CameraInfo.CAMERA_FACING_BACK) ?
+                Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF);
+
         camera.setParameters(parameters);
         camera.setDisplayOrientation(rotation);
 

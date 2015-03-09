@@ -3,6 +3,7 @@ package pro.vylgin.cameraarcsinus.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -41,6 +42,9 @@ public class RecordFragment extends Fragment {
     private boolean isRecording = false;
     private int cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
     private boolean deviceHaveTwoCameras = Camera.getNumberOfCameras() >= 2;
+    private boolean deviceHaveFlash;
+    private boolean isFlashing = false;
+    private ImageButton flashButton;
 
     public static RecordFragment newInstance() {
         File videoPath = new File(VIDEO_PATH);
@@ -62,6 +66,7 @@ public class RecordFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        deviceHaveFlash = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
     }
 
     @Override
@@ -71,7 +76,7 @@ public class RecordFragment extends Fragment {
         ((ActionBarActivity)getActivity()).getSupportActionBar().hide();
 
         camera = getCameraInstance();
-        cameraPreview = new CameraPreview(getActivity(), cameraId, camera);
+        cameraPreview = new CameraPreview(getActivity(), cameraId, camera, isFlashing);
         FrameLayout preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);
         preview.addView(cameraPreview);
 
@@ -81,6 +86,23 @@ public class RecordFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 changeCamera();
+            }
+        });
+
+        flashButton = (ImageButton) rootView.findViewById(R.id.flashImageButton);
+        flashButton.setVisibility(deviceHaveFlash ? View.VISIBLE : View.INVISIBLE);
+        flashButton.setBackgroundResource(isFlashing ? R.drawable.flash_on_selector : R.drawable.flash_off_selector);
+        flashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFlashing) {
+                    isFlashing = false;
+                } else {
+                    isFlashing = true;
+                }
+
+                cameraPreview.restartPreviewWithParameters(isFlashing);
+                flashButton.setBackgroundResource(isFlashing ? R.drawable.flash_on_selector : R.drawable.flash_off_selector);
             }
         });
 
@@ -146,6 +168,13 @@ public class RecordFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        cameraPreview.restartPreviewWithParameters(isFlashing);
+    }
+
+    @Override
     public void onDestroyView() {
         ((ActionBarActivity)getActivity()).getSupportActionBar().show();
 
@@ -166,8 +195,10 @@ public class RecordFragment extends Fragment {
 
             if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+                flashButton.setVisibility(View.VISIBLE);
             } else {
                 cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+                flashButton.setVisibility(View.INVISIBLE);
             }
 
             prepareCameraPreview();
@@ -244,7 +275,7 @@ public class RecordFragment extends Fragment {
 
         ViewGroup rootLayout = (ViewGroup) cameraPreview.getParent();
         cameraPreview.removeView(rootLayout);
-        cameraPreview = new CameraPreview(getActivity(), cameraId, camera);
+        cameraPreview = new CameraPreview(getActivity(), cameraId, camera, isFlashing);
         cameraPreview.showView(rootLayout);
     }
 

@@ -16,10 +16,19 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/change_camera_selector"
+            android:contentDescription="@string/change_camera" />
+
+        <ImageButton
+            android:id="@+id/flashImageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/flash_off_selector"
             android:contentDescription="@string/change_camera" />
 
     </LinearLayout>
