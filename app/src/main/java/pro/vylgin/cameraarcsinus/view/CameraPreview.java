@@ -76,6 +76,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception e){
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
+
+        this.isFlashing = isFlashing;
     }
 
     public void removeView(ViewGroup rootLayout) {

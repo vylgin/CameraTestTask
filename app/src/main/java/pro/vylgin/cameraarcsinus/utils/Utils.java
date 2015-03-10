@@ -10,6 +10,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import pro.vylgin.cameraarcsinus.model.MediaContent;
+
 public class Utils {
 
     public static final String MEDIA_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -58,6 +60,17 @@ public class Utils {
         cursor.close();
 
         return res;
+    }
+
+    public static void updateMediaContent() {
+        MediaContent.ITEMS.clear();
+        MediaContent.ITEM_MAP.clear();
+
+        File dir = new File(Utils.MEDIA_DIR);
+        File[] filelist = dir.listFiles();
+        for (int i = 0; i < filelist.length; i++) {
+            MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+        }
     }
 
 }

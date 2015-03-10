@@ -1,5 +1,6 @@
 package pro.vylgin.cameraarcsinus.activity;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import java.io.File;
 
 import pro.vylgin.cameraarcsinus.R;
+import pro.vylgin.cameraarcsinus.fragment.MediaListFragment;
 import pro.vylgin.cameraarcsinus.fragment.RecordFragment;
 import pro.vylgin.cameraarcsinus.utils.Utils;
 
@@ -19,15 +21,25 @@ import pro.vylgin.cameraarcsinus.utils.Utils;
 public class MainActivity extends ActionBarActivity implements FragmentManager.OnBackStackChangedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String RECORD_FRAGMENT_TAG = "RECORD_FRAGMENT_TAG";
     private static final int RECORD_AUDIO = 1;
+    private MediaListFragment mediaListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         getFragmentManager().addOnBackStackChangedListener(this);
+        showMediaListFragment();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        showMediaListFragment();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -59,6 +71,9 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
                 File audioFileFrom = new File(Utils.getRealPathFromURI(this, audioUri));
                 File audioFileTo = Utils.getOutputMediaFile(Utils.MediaType.AUDIO);
                 audioFileFrom.renameTo(audioFileTo);
+
+                showMediaListFragment();
+                updateMediaFragment();
             }
         }
     }
@@ -66,6 +81,7 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
     @Override
     public void onBackStackChanged() {
         shouldDisplayHomeUp();
+        updateMediaFragment();
     }
 
     @Override
@@ -83,20 +99,64 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
         }
     }
 
-    public void shouldDisplayHomeUp(){
+    public void shouldDisplayHomeUp() {
         boolean canback = getFragmentManager().getBackStackEntryCount() > 0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
     }
 
     private void showRecordFragment() {
-        RecordFragment recordFragment = (RecordFragment) getFragmentManager().findFragmentById(R.id.contentFrameLayout);
-        if (recordFragment == null) {
+        Fragment fragmentInContentFrameLayout = getFragmentManager().findFragmentById(R.id.contentFrameLayout);
+        RecordFragment recordFragment;
+
+        if (fragmentInContentFrameLayout instanceof RecordFragment) {
+            recordFragment = (RecordFragment) fragmentInContentFrameLayout;
+            getFragmentManager()
+                    .beginTransaction()
+                    .attach(recordFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
             recordFragment = RecordFragment.newInstance();
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.contentFrameLayout, recordFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.contentFrameLayout, recordFragment)
-                .addToBackStack(null)
-                .commit();
+
+    }
+
+    private void showMediaListFragment() {
+        MediaListFragment listFragment = (MediaListFragment) getFragmentManager().findFragmentByTag(RECORD_FRAGMENT_TAG);
+        if (listFragment != null && listFragment.isVisible()) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.contentFrameLayout, listFragment)
+                    .commit();
+            this.mediaListFragment = listFragment;
+            updateMediaFragment();
+        } else {
+            Fragment fragmentInContentFrameLayout = getFragmentManager().findFragmentById(R.id.contentFrameLayout);
+            if (fragmentInContentFrameLayout instanceof RecordFragment) {
+                RecordFragment recordFragment = (RecordFragment) fragmentInContentFrameLayout;
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.contentFrameLayout, recordFragment)
+                        .commit();
+            } else {
+                listFragment = MediaListFragment.newInstance();
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.contentFrameLayout, listFragment)
+                        .commit();
+                this.mediaListFragment = listFragment;
+            }
+        }
+
+    }
+
+    private void updateMediaFragment() {
+        Utils.updateMediaContent();
+        mediaListFragment.updateMediaList();
     }
 }
