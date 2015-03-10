@@ -7,4 +7,5 @@
     <string name="stop_record">STOP</string>
     <string name="record">REC</string>
     <string name="cancel">CANCEL</string>
+    <string name="empty_media_list">Медиафайлы не найдены</string>
 </resources>

@@ -37,25 +37,22 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-
-        updateMediaList();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-//        updateMediaList();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mediaitem, container, false);
 
-        listView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) listView).setAdapter(adapter);
-
+        listView = (AbsListView) view.findViewById(R.id.list);
+        listView.setEmptyView(view.findViewById(R.id.empty));
         listView.setOnItemClickListener(this);
+
+        updateMediaList();
 
         return view;
     }
@@ -79,6 +76,12 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
         if (isAdded()) {
             adapter = new ArrayAdapter<MediaContent.MediaItem>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, MediaContent.ITEMS);
+
+            ((AdapterView<ListAdapter>) listView).setAdapter(adapter);
+
+            if (MediaContent.ITEMS.isEmpty()) {
+                setEmptyText(getActivity().getString(R.string.empty_media_list));
+            }
         }
     }
 }
