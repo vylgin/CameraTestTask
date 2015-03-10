@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pro.vylgin.cameraarcsinus.fragment.MediaListFragment">
+    tools:context="pro.vylgin.cameraarcsinus.fragment.MediaListFragment"
+    android:orientation="vertical">
+
+    <Spinner
+        android:id="@+id/changeMediaContentSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/mediaListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <TextView
-        android:id="@+id/empty"
+        android:id="@+id/emptyTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center" />
 
-</FrameLayout>
+</LinearLayout>

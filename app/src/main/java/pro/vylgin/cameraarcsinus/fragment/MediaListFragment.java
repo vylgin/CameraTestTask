@@ -9,6 +9,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import pro.vylgin.cameraarcsinus.R;
@@ -20,6 +21,7 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
 
     private AbsListView listView;
     private ListAdapter adapter;
+    private int currentSpinnerPosition = Utils.ALL_MEDIAFILES_PISITION;
 
     public static MediaListFragment newInstance() {
         MediaListFragment fragment = new MediaListFragment();
@@ -48,11 +50,29 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mediaitem, container, false);
 
-        listView = (AbsListView) view.findViewById(R.id.list);
-        listView.setEmptyView(view.findViewById(R.id.empty));
+        listView = (AbsListView) view.findViewById(R.id.mediaListView);
+        listView.setEmptyView(view.findViewById(R.id.emptyTextView));
         listView.setOnItemClickListener(this);
-
         updateMediaList();
+
+        Spinner spinner = (Spinner) view.findViewById(R.id.changeMediaContentSpinner);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.type_media_content_array, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentSpinnerPosition = position;
+                updateMediaList();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         return view;
     }
@@ -72,7 +92,8 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
 
 
     public void updateMediaList() {
-        Utils.updateMediaContent();
+        Utils.updateMediaContent(currentSpinnerPosition);
+
         if (isAdded()) {
             adapter = new ArrayAdapter<MediaContent.MediaItem>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, MediaContent.ITEMS);

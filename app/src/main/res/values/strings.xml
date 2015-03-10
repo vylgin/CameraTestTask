@@ -8,4 +8,11 @@
     <string name="record">REC</string>
     <string name="cancel">CANCEL</string>
     <string name="empty_media_list">Медиафайлы не найдены</string>
+
+    <string-array name="type_media_content_array">
+        <item>Все медиафайлы</item>
+        <item>Аудио</item>
+        <item>Видео</item>
+    </string-array>
+
 </resources>

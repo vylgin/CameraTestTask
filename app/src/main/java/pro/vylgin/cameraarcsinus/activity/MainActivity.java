@@ -156,7 +156,6 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
     }
 
     private void updateMediaFragment() {
-        Utils.updateMediaContent();
         mediaListFragment.updateMediaList();
     }
 }

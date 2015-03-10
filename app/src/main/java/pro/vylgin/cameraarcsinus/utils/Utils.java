@@ -21,6 +21,13 @@ public class Utils {
 
     public static enum MediaType {AUDIO, VIDEO}
 
+    public static final int ALL_MEDIAFILES_PISITION = 0;
+    public static final int AUDIO_PISITION = 1;
+    public static final int VIDEO_PISITION = 2;
+
+    public static final String AUD = "AUD";
+    public static final String VID = "VID";
+
     public static File getOutputMediaFile(MediaType mediaType) {
         File mediaStorageDir = new File(Utils.MEDIA_DIR);
         if (!mediaStorageDir.exists()) {
@@ -35,11 +42,11 @@ public class Utils {
         switch (mediaType) {
             case AUDIO:
                 String timeStamp = new SimpleDateFormat(dateMask).format(new Date());
-                mediaFile = new File(mediaStorageDir.getPath() + File.separator + "AUD_" + timeStamp + ".mp3");
+                mediaFile = new File(mediaStorageDir.getPath() + File.separator + AUD + "_" + timeStamp + ".mp3");
                 break;
             case VIDEO:
                 timeStamp = new SimpleDateFormat(dateMask).format(new Date());
-                mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
+                mediaFile = new File(mediaStorageDir.getPath() + File.separator + VID + "_" + timeStamp + ".mp4");
                 break;
         }
 
@@ -62,14 +69,32 @@ public class Utils {
         return res;
     }
 
-    public static void updateMediaContent() {
+    public static void updateMediaContent(int currentSpinnerPosition) {
         MediaContent.ITEMS.clear();
         MediaContent.ITEM_MAP.clear();
 
         File dir = new File(Utils.MEDIA_DIR);
         File[] filelist = dir.listFiles();
-        for (int i = 0; i < filelist.length; i++) {
-            MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+        switch (currentSpinnerPosition) {
+            case ALL_MEDIAFILES_PISITION:
+                for (int i = 0; i < filelist.length; i++) {
+                    MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                }
+                break;
+            case AUDIO_PISITION:
+                for (int i = 0; i < filelist.length; i++) {
+                    if (filelist[i].getName().contains(AUD)) {
+                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                    }
+                }
+                break;
+            case VIDEO_PISITION:
+                for (int i = 0; i < filelist.length; i++) {
+                    if (filelist[i].getName().contains(VID)) {
+                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                    }
+                }
+                break;
         }
     }
 
