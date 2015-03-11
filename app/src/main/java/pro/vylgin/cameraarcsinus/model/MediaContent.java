@@ -10,13 +10,6 @@ public class MediaContent {
     public static List<MediaItem> ITEMS = new ArrayList<>();
     public static Map<Integer, MediaItem> ITEM_MAP = new HashMap<>();
 
-//    static {
-//        // Add 3 sample items.
-//        addItem(new MediaItem(1, "Item 1"));
-//        addItem(new MediaItem(2, "Item 2"));
-//        addItem(new MediaItem(3, "Item 3"));
-//    }
-
     public static void addItem(MediaItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);

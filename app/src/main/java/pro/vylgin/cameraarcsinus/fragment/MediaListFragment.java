@@ -2,8 +2,10 @@ package pro.vylgin.cameraarcsinus.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +25,10 @@ import pro.vylgin.cameraarcsinus.utils.Utils;
 
 public class MediaListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    private static final String TAG = MediaListFragment.class.getSimpleName();
+    private static final String CURRENT_SPINNER_POSITION = "CURRENT_SPINNER_POSITION";
 
     private AbsListView listView;
-    private ListAdapter adapter;
-    private int currentSpinnerPosition = Utils.ALL_MEDIAFILES_PISITION;
+    private int currentSpinnerPosition;
 
     public static MediaListFragment newInstance() {
         MediaListFragment fragment = new MediaListFragment();
@@ -61,11 +62,14 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
         listView.setOnItemClickListener(this);
         updateMediaList();
 
+        currentSpinnerPosition = getCurrentSpinnerPositionFromPreferences();
+
         Spinner spinner = (Spinner) view.findViewById(R.id.changeMediaContentSpinner);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.type_media_content_array, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(currentSpinnerPosition);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -83,6 +87,11 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
         return view;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        saveCurrentSpinnerPositionToPreferences();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -112,14 +121,26 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
         Utils.updateMediaContent(currentSpinnerPosition);
 
         if (isAdded()) {
-            adapter = new ArrayAdapter<MediaContent.MediaItem>(getActivity(),
+            ListAdapter adapter = new ArrayAdapter<>(getActivity(),
                     android.R.layout.simple_list_item_1, android.R.id.text1, MediaContent.ITEMS);
 
-            ((AdapterView<ListAdapter>) listView).setAdapter(adapter);
+            listView.setAdapter(adapter);
 
             if (MediaContent.ITEMS.isEmpty()) {
-                setEmptyText(getActivity().getString(R.string.empty_media_list));
+                setEmptyText(getActivity().getResources().getString(R.string.empty_media_list));
             }
         }
+    }
+
+    private void saveCurrentSpinnerPositionToPreferences(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(CURRENT_SPINNER_POSITION, currentSpinnerPosition);
+        editor.apply();
+    }
+
+    private int getCurrentSpinnerPositionFromPreferences(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return preferences.getInt(CURRENT_SPINNER_POSITION, Utils.ALL_MEDIAFILES_PISITION);
     }
 }

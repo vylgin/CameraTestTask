@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,7 +33,6 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
 
         setContentView(R.layout.activity_main);
         getFragmentManager().addOnBackStackChangedListener(this);
-        showMediaListFragment();
     }
 
     @Override
@@ -71,7 +71,9 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
                 Uri audioUri = data.getData();
                 File audioFileFrom = new File(Utils.getRealPathFromURI(this, audioUri));
                 File audioFileTo = Utils.getOutputMediaFile(Utils.MediaType.AUDIO);
-                audioFileFrom.renameTo(audioFileTo);
+                if (audioFileFrom.renameTo(audioFileTo)) {
+                    Log.d(TAG, "File " + audioFileFrom.getAbsolutePath() + "renamed to " + audioFileTo.getAbsolutePath());
+                }
 
                 showMediaListFragment();
                 updateMediaFragment();
@@ -129,10 +131,10 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
 
     private void showMediaListFragment() {
         MediaListFragment listFragment = (MediaListFragment) getFragmentManager().findFragmentByTag(RECORD_FRAGMENT_TAG);
-        if (listFragment != null && listFragment.isVisible()) {
+        if (listFragment != null && listFragment.isAdded()) {
             getFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.contentFrameLayout, listFragment)
+                    .attach(listFragment)
                     .commit();
             this.mediaListFragment = listFragment;
             updateMediaFragment();
@@ -142,7 +144,7 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
                 RecordFragment recordFragment = (RecordFragment) fragmentInContentFrameLayout;
                 getFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.contentFrameLayout, recordFragment)
+                        .attach(recordFragment)
                         .commit();
             } else {
                 listFragment = MediaListFragment.newInstance();
