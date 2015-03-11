@@ -78,20 +78,20 @@ public class Utils {
         switch (currentSpinnerPosition) {
             case ALL_MEDIAFILES_PISITION:
                 for (int i = 0; i < filelist.length; i++) {
-                    MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                    MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName(), filelist[i].getPath()));
                 }
                 break;
             case AUDIO_PISITION:
                 for (int i = 0; i < filelist.length; i++) {
                     if (filelist[i].getName().contains(AUD)) {
-                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName(), filelist[i].getPath()));
                     }
                 }
                 break;
             case VIDEO_PISITION:
                 for (int i = 0; i < filelist.length; i++) {
                     if (filelist[i].getName().contains(VID)) {
-                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName()));
+                        MediaContent.addItem(new MediaContent.MediaItem(i, filelist[i].getName(), filelist[i].getPath()));
                     }
                 }
                 break;

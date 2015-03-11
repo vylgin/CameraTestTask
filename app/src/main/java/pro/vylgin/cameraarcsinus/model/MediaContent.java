@@ -25,10 +25,12 @@ public class MediaContent {
     public static class MediaItem {
         public int id;
         public String content;
+        public String contentPath;
 
-        public MediaItem(int id, String content) {
+        public MediaItem(int id, String content, String contentPath) {
             this.id = id;
             this.content = content;
+            this.contentPath = contentPath;
         }
 
         @Override

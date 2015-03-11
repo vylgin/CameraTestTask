@@ -21,6 +21,7 @@ import pro.vylgin.cameraarcsinus.utils.Utils;
 public class MainActivity extends ActionBarActivity implements FragmentManager.OnBackStackChangedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private static final String RECORD_FRAGMENT_TAG = "RECORD_FRAGMENT_TAG";
     private static final int RECORD_AUDIO = 1;
     private MediaListFragment mediaListFragment;

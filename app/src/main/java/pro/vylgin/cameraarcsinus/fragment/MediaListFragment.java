@@ -1,6 +1,8 @@
 package pro.vylgin.cameraarcsinus.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +14,16 @@ import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.File;
+
 import pro.vylgin.cameraarcsinus.R;
 import pro.vylgin.cameraarcsinus.model.MediaContent;
 import pro.vylgin.cameraarcsinus.utils.Utils;
 
 
 public class MediaListFragment extends Fragment implements AbsListView.OnItemClickListener {
+
+    private static final String TAG = MediaListFragment.class.getSimpleName();
 
     private AbsListView listView;
     private ListAdapter adapter;
@@ -80,6 +86,17 @@ public class MediaListFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String mediaFilePath = MediaContent.ITEMS.get(position).contentPath;
+        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+        File file = new File(mediaFilePath);
+
+        if (mediaFilePath.contains(Utils.AUD)) {
+            viewIntent.setDataAndType(Uri.fromFile(file), "audio/*");
+        } else if (mediaFilePath.contains(Utils.VID)) {
+            viewIntent.setDataAndType(Uri.fromFile(file), "video/*");
+        }
+
+        startActivity(Intent.createChooser(viewIntent, null));
     }
 
     public void setEmptyText(CharSequence emptyText) {
