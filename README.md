@@ -1,5 +1,5 @@
-# CameraArcsinus
-Тестовое задание в фирму Arcsinus
+# CameraTestTask
+Тестовое задание
 
 ![Screenshot](https://raw.githubusercontent.com/vylgin/CameraArcsinus/master/Screenshot/Screenshot_2015-03-11-02-34-30.png)
 &nbsp;
