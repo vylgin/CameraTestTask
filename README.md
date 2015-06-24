@@ -1,9 +1,9 @@
 # CameraTestTask
 Тестовое задание
 
-![Screenshot](https://raw.githubusercontent.com/vylgin/CameraArcsinus/master/Screenshot/Screenshot_2015-03-11-02-34-30.png)
+![Screenshot](https://raw.githubusercontent.com/vylgin/CameraTestTask/master/Screenshot/Screenshot_2015-03-11-02-34-30.png)
 &nbsp;
-![Screenshot](https://raw.githubusercontent.com/vylgin/CameraArcsinus/master/Screenshot/Screenshot_2015-03-09-23-48-05.png)
+![Screenshot](https://raw.githubusercontent.com/vylgin/CameraTestTask/master/Screenshot/Screenshot_2015-03-09-23-48-05.png)
 
 ### Задание
 
